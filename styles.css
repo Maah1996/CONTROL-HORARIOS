@@ -1,224 +1,274 @@
 :root {
-  --bg: #eef3f8;
-  --card: #ffffff;
-  --ink: #172033;
-  --muted: #5c667a;
-  --line: #d8e0ea;
-  --primary: #1f6feb;
-  --success: #16833a;
-  --warning: #b7791f;
-  --danger: #c53030;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --blue-900: #223f94;
+  --blue-800: #24469d;
+  --indigo-900: #2f2f82;
+  --grid-line: #d7e0ec;
+  --cell-bg: #eef4fb;
+  --cell-bg-soft: #f8fbff;
+  --free-bg: #edf2f8;
+  --text: #0e1b35;
+  --muted: #52627a;
+  --green: #008236;
+  --orange: #e16a00;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
   min-height: 100vh;
-  color: var(--ink);
-  background: linear-gradient(135deg, #e8f0ff 0%, var(--bg) 48%, #f8fbff 100%);
+  color: var(--text);
+  background: #ffffff;
 }
 
-.sheet {
-  width: min(1120px, calc(100% - 32px));
-  margin: 32px auto;
-  padding: 32px;
-  background: var(--card);
-  border-radius: 24px;
-  box-shadow: 0 24px 60px rgba(20, 31, 52, 0.12);
+.schedule-app {
+  width: 100%;
+  padding: 3px 0 0;
 }
 
-.hero {
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  align-items: flex-start;
-  margin-bottom: 28px;
-}
-
-.eyebrow {
-  margin: 0 0 8px;
-  color: var(--primary);
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-h1 {
-  margin: 0;
-  font-size: clamp(1.8rem, 4vw, 3rem);
-  line-height: 1.05;
-}
-
-.description {
-  max-width: 720px;
-  margin: 14px 0 0;
-  color: var(--muted);
-  font-size: 1rem;
-}
-
-.print-button {
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
   border: 0;
-  border-radius: 999px;
-  padding: 13px 22px;
-  color: white;
-  background: var(--primary);
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: 0 12px 28px rgba(31, 111, 235, 0.24);
 }
 
-.worker-card,
-.summary {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.worker-card {
-  padding: 20px;
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  background: #fbfdff;
-}
-
-label {
-  display: grid;
-  gap: 8px;
-  color: var(--muted);
-  font-size: 0.84rem;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-
-input,
-select {
+.schedule-board {
   width: 100%;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 12px 13px;
-  color: var(--ink);
-  background: white;
-  font: inherit;
-  text-transform: none;
-}
-
-.summary {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.summary article {
-  padding: 18px;
-  border-radius: 18px;
-  background: #f5f8fc;
-  border: 1px solid var(--line);
-}
-
-.summary span {
-  display: block;
-  color: var(--muted);
-  font-size: 0.82rem;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-
-.summary strong {
-  display: block;
-  margin-top: 8px;
-  font-size: 1.45rem;
-}
-
-.balance.ok strong { color: var(--success); }
-.balance.pending strong { color: var(--warning); }
-.balance.over strong { color: var(--danger); }
-
-.table-wrapper {
   overflow-x: auto;
-  border: 1px solid var(--line);
-  border-radius: 18px;
+  border-top: 1px solid #25489d;
 }
 
-table {
+.weekly-table {
   width: 100%;
+  min-width: 1827px;
   border-collapse: collapse;
-  min-width: 760px;
+  table-layout: fixed;
+  background: #ffffff;
 }
 
-th,
-td {
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--line);
+.weekly-table th {
+  height: 47px;
+  padding: 5px 4px 6px;
+  border-right: 1px solid rgba(255, 255, 255, 0.22);
+  border-bottom: 1px solid #17347e;
+  color: #ffffff;
+  background: var(--blue-900);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.05;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.weekly-table th:first-child {
   text-align: left;
 }
 
-th {
-  color: #34425a;
-  background: #f2f6fb;
-  font-size: 0.82rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+.weekly-table th.weekend-header {
+  background: var(--indigo-900);
 }
 
-tbody tr.free-day {
-  background: #fff9e8;
+.weekly-table th.total-header,
+.weekly-table th.extra-header {
+  background: var(--blue-900);
 }
 
-tbody tr.free-day input {
-  color: #9a6a00;
-  background: #fff3c4;
-  font-weight: 800;
-  text-align: center;
+.day-title {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.01em;
 }
 
-.day-name {
-  font-weight: 800;
-}
-
-.hours-cell {
-  font-weight: 800;
-}
-
-tfoot td {
-  border-bottom: 0;
-  background: #eef5ff;
-  font-weight: 900;
-}
-
-.print-note {
-  margin: 32px 0 0;
-  color: var(--muted);
+.day-date {
+  display: block;
+  margin-top: 3px;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 9px;
   font-weight: 700;
 }
 
-@media (max-width: 820px) {
-  .sheet { padding: 22px; }
-  .hero { flex-direction: column; }
-  .worker-card,
-  .summary { grid-template-columns: 1fr; }
+.weekly-table td {
+  height: 70px;
+  padding: 4px;
+  border-right: 1px solid var(--grid-line);
+  border-bottom: 1px solid var(--grid-line);
+  background: var(--cell-bg-soft);
+  font-size: 12px;
+  vertical-align: top;
+}
+
+.weekly-table td.day-cell {
+  background: var(--cell-bg);
+}
+
+.col-worker { width: 173px; }
+.col-shift { width: 101px; }
+.col-dayoff { width: 94px; }
+.col-day { width: 189px; }
+.col-total { width: 72px; }
+.col-extra { width: 64px; }
+
+.worker-cell,
+.shift-cell,
+.dayoff-cell,
+.total-cell,
+.extra-cell {
+  background: #ffffff !important;
+}
+
+.worker-select,
+.shift-select,
+.dayoff-select,
+.time-select {
+  width: 100%;
+  height: 24px;
+  border: 1px solid #d7e1ed;
+  border-radius: 4px;
+  color: #061830;
+  background-color: #f7fbff;
+  font: inherit;
+  outline: none;
+}
+
+.worker-select {
+  padding-left: 7px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.shift-select,
+.dayoff-select {
+  padding-left: 7px;
+}
+
+.worker-meta {
+  margin-top: 4px;
+  color: #2e4b72;
+  font-size: 9px;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.worker-meta span {
+  display: block;
+}
+
+.time-select + .time-select {
+  margin-top: 2px;
+}
+
+.day-hours {
+  margin-top: 3px;
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+}
+
+.free-label {
+  display: none;
+  height: 100%;
+  min-height: 58px;
+  align-items: center;
+  justify-content: center;
+  color: #25345c;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+.day-cell.is-free {
+  background: var(--free-bg);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.day-cell.is-free .time-select,
+.day-cell.is-free .day-hours {
+  display: none;
+}
+
+.day-cell.is-free .free-label {
+  display: flex;
+}
+
+.total-cell,
+.extra-cell {
+  text-align: center;
+  vertical-align: middle !important;
+}
+
+.total-hours {
+  margin-top: 19px;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.target-hours {
+  margin-top: 3px;
+  color: #2e4b72;
+  font-size: 9px;
+  line-height: 1;
+}
+
+.extra-hours {
+  margin-top: 22px;
+  color: var(--orange);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.extra-hours.neutral {
+  color: #566783;
+  font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .schedule-app {
+    padding-top: 0;
+  }
+
+  .weekly-table {
+    min-width: 1280px;
+  }
 }
 
 @media print {
-  body { background: white; }
-  .sheet {
-    width: 100%;
-    margin: 0;
-    padding: 12mm;
-    border-radius: 0;
-    box-shadow: none;
+  @page {
+    size: landscape;
+    margin: 4mm;
   }
-  .no-print { display: none; }
-  input,
-  select {
-    border: 0;
-    padding-left: 0;
-    background: transparent;
+
+  .schedule-board {
+    overflow: visible;
+  }
+
+  .weekly-table {
+    min-width: 0;
+  }
+
+  .weekly-table th,
+  .weekly-table td {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .worker-select,
+  .shift-select,
+  .dayoff-select,
+  .time-select {
     appearance: none;
   }
-  .table-wrapper { overflow: visible; }
-  table { min-width: 0; }
-  th,
-  td { padding: 9px; }
 }
