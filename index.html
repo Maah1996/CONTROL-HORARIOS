@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Control de horario semanal</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="sheet" aria-labelledby="page-title">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Planilla imprimible</p>
+          <h1 id="page-title">Control de horario semanal por trabajador</h1>
+          <p class="description">
+            Registra estado, día libre, jornada diaria y controla el cumplimiento de las 42 horas semanales.
+          </p>
+        </div>
+        <button class="print-button no-print" type="button" id="printButton">Imprimir planilla</button>
+      </header>
+
+      <section class="worker-card" aria-label="Datos del trabajador">
+        <label>
+          Trabajador
+          <input id="workerName" type="text" placeholder="Nombre y apellido" />
+        </label>
+        <label>
+          Semana
+          <input id="weekStart" type="week" />
+        </label>
+        <label>
+          Estado
+          <select id="workStatus">
+            <option value="Trabaja">Trabaja</option>
+            <option value="Vacaciones">Vacaciones</option>
+            <option value="Licencia">Licencia</option>
+            <option value="Permiso">Permiso</option>
+          </select>
+        </label>
+        <label>
+          Día libre semanal
+          <select id="dayOff">
+            <option value="">Seleccionar</option>
+            <option value="Lunes">Lunes</option>
+            <option value="Martes">Martes</option>
+            <option value="Miércoles">Miércoles</option>
+            <option value="Jueves">Jueves</option>
+            <option value="Viernes">Viernes</option>
+            <option value="Sábado">Sábado</option>
+            <option value="Domingo">Domingo</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="summary" aria-live="polite">
+        <article>
+          <span>Total semanal</span>
+          <strong id="weeklyTotal">0 h</strong>
+        </article>
+        <article>
+          <span>Meta semanal</span>
+          <strong>42 h</strong>
+        </article>
+        <article class="balance" id="balanceCard">
+          <span>Diferencia</span>
+          <strong id="weeklyBalance">Faltan 42 h</strong>
+        </article>
+      </section>
+
+      <section class="table-wrapper" aria-label="Horario semanal">
+        <table>
+          <thead>
+            <tr>
+              <th>Día</th>
+              <th>Desde</th>
+              <th>Hasta</th>
+              <th>Horas del día</th>
+              <th>Observación</th>
+            </tr>
+          </thead>
+          <tbody id="scheduleBody"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3">Total de horas semanales</td>
+              <td id="footerTotal">0 h</td>
+              <td id="footerStatus">Pendiente de completar</td>
+            </tr>
+          </tfoot>
+        </table>
+      </section>
+
+      <p class="print-note">
+        Firma trabajador: ____________________________ &nbsp;&nbsp;&nbsp; Firma responsable: ____________________________
+      </p>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
