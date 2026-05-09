@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BD | Control Horarios Chile</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="database-page">
+    <header class="hero page-hero">
+      <nav class="topbar" aria-label="Navegación principal">
+        <a class="brand" href="index.html#inicio" aria-label="Control Horarios Chile">
+          <span class="brand-mark">CH</span>
+          <span>Control Horarios</span>
+        </a>
+        <div class="nav-links">
+          <a href="index.html#colaboradores">Colaboradores</a>
+          <a href="database.html" aria-current="page">BD</a>
+          <a href="index.html#horarios">Horarios</a>
+          <a href="index.html#resumen">Resumen</a>
+        </div>
+      </nav>
+
+      <section class="hero-grid page-hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Hoja independiente</p>
+          <h1>BD automática de colaboradores y horarios.</h1>
+          <p class="hero-text">
+            Esta base de datos se llena con los colaboradores y horarios creados en la hoja principal. Cada dato puede editarse aquí y vuelve a quedar guardado para el horario semanal.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="index.html#horarios">Volver a horarios</a>
+            <a class="button secondary" href="#base-datos">Editar BD</a>
+          </div>
+        </div>
+      </section>
+    </header>
+
+    <main>
+      <section id="base-datos" class="panel database-section database-sheet">
+        <div class="section-heading inline-heading">
+          <div>
+            <p class="eyebrow">BD</p>
+            <h2>Base de datos editable</h2>
+            <p>Los nombres, secciones, contratos y turnos llegan automáticamente desde la hoja de horarios. Si corriges un dato en esta hoja, también se actualiza el horario semanal.</p>
+          </div>
+          <label class="month-picker">
+            Mes de control
+            <input id="database-month" type="month" />
+          </label>
+        </div>
+
+        <div class="database-help">
+          <strong>Sincronización automática:</strong>
+          <span>al completar entradas, salidas o días libres en horarios, esta tabla muestra los mismos datos y calcula el total semanal.</span>
+        </div>
+
+        <div class="table-wrap database-wrap" aria-live="polite">
+          <table class="database-table schedule-database-table">
+            <thead>
+              <tr>
+                <th>Colaborador</th>
+                <th>Sección</th>
+                <th>Contrato</th>
+                <th>Lunes</th>
+                <th>Martes</th>
+                <th>Miércoles</th>
+                <th>Jueves</th>
+                <th>Viernes</th>
+                <th>Sábado</th>
+                <th>Domingo</th>
+                <th>Total semana</th>
+                <th>Horas mes</th>
+                <th>Licencia</th>
+                <th>Permiso</th>
+                <th>Vacaciones</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="database-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Los cambios se guardan en la base local del navegador y se comparten con la hoja de horarios de esta aplicación.</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

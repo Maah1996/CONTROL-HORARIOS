@@ -617,3 +617,93 @@ select:focus {
 [hidden] {
   display: none !important;
 }
+
+.page-hero {
+  padding-bottom: 56px;
+}
+
+.page-hero-grid {
+  grid-template-columns: minmax(0, 1fr);
+  padding-top: 58px;
+}
+
+.page-hero-grid h1 {
+  max-width: 980px;
+  font-size: clamp(2.4rem, 6vw, 5rem);
+}
+
+.nav-links a[aria-current="page"] {
+  color: #ffffff;
+}
+
+.database-sheet {
+  margin-top: -34px;
+}
+
+.database-help {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 18px;
+  border: 1px solid #bbf7d0;
+  border-radius: 18px;
+  padding: 14px 16px;
+  background: #f0fdf4;
+  color: #166534;
+  line-height: 1.5;
+}
+
+.schedule-database-table {
+  min-width: 1880px;
+}
+
+.schedule-database-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.schedule-database-table td:first-child,
+.schedule-database-table th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: #ffffff;
+}
+
+.schedule-database-table th:first-child {
+  background: #ecfdf5;
+}
+
+.database-day-cell {
+  min-width: 150px;
+}
+
+.database-time-fields {
+  display: grid;
+  gap: 8px;
+}
+
+.database-time-fields input {
+  min-width: 118px;
+  padding: 9px;
+}
+
+.compact-toggle {
+  margin-bottom: 8px;
+  font-size: 0.78rem;
+}
+
+.database-day-cell small {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+@media print {
+  .database-help,
+  .database-page .hero-actions {
+    display: none !important;
+  }
+}
