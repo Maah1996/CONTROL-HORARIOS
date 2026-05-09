@@ -5,11 +5,11 @@ Página web estática para planificar horarios semanales de colaboradores en Chi
 ## Funciones
 
 - Registro de colaboradores con nombre, cargo, sección, tipo de contrato y horas pactadas.
-- Planificador semanal con entrada, salida y día libre por cada día.
+- Planificador semanal por mes y semana, con carga/repetición de semanas, turnos mañana/tarde automáticos de 42 horas y día libre por cada día.
 - Resumen por colaborador con total semanal, límite aplicado y horas extra estimadas.
 - Indicadores generales de dotación, secciones activas, horas programadas y horas extra.
 - Configuración del límite legal vigente, precargado en **42 horas semanales** para la etapa chilena vigente desde el 26 de abril de 2026.
-- Persistencia local con `localStorage`, impresión y exportación a PDF desde el navegador.
+- Persistencia local con `localStorage`, impresión por sección o turno completo y exportación a PDF desde el navegador.
 
 ## Uso
 
