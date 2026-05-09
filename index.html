@@ -15,6 +15,7 @@
         </a>
         <div class="nav-links">
           <a href="#colaboradores">Colaboradores</a>
+          <a href="#base-datos">Base de datos</a>
           <a href="#horarios">Horarios</a>
           <a href="#resumen">Resumen</a>
         </div>
@@ -77,7 +78,7 @@
         <div class="section-heading">
           <p class="eyebrow">Paso 1</p>
           <h2>Ingresar colaborador y sección</h2>
-          <p>Registra a cada persona con su cargo, sección, tipo de contrato y horas semanales pactadas.</p>
+          <p>Registra a cada persona con su sección y tipo de contrato. La información quedará guardada en la base de datos interna para alimentar el horario semanal.</p>
         </div>
 
         <form id="employee-form" class="employee-form">
@@ -87,15 +88,20 @@
           </label>
           <label>
             Sección de trabajo
-            <input id="employee-section" name="section" type="text" placeholder="Ej: Cocina, Caja, Bodega" required />
+            <select id="employee-section" name="section" required>
+              <option value="COCINA">COCINA</option>
+              <option value="PANADERÍA">PANADERÍA</option>
+              <option value="PASTELERÍA">PASTELERÍA</option>
+              <option value="SALA DE VENTA">SALA DE VENTA</option>
+              <option value="BODEGA">BODEGA</option>
+              <option value="ADMINISTRACIÓN">ADMINISTRACIÓN</option>
+              <option value="LIMPIEZA">LIMPIEZA</option>
+              <option value="OTRA">Agregar otra sección</option>
+            </select>
           </label>
-          <label>
-            Cargo
-            <input id="employee-role" name="role" type="text" placeholder="Ej: Operaria" required />
-          </label>
-          <label>
-            Horas pactadas/semana
-            <input id="employee-limit" name="limit" type="number" min="1" max="42" step="0.5" value="42" required />
+          <label id="custom-section-label" hidden>
+            Otra sección
+            <input id="employee-section-other" name="otherSection" type="text" placeholder="Ej: Caja" />
           </label>
           <label>
             Tipo de contrato
@@ -110,12 +116,44 @@
         </form>
       </section>
 
+      <section id="base-datos" class="panel database-section">
+        <div class="section-heading inline-heading">
+          <div>
+            <p class="eyebrow">Base de datos</p>
+            <h2>Registro interno de colaboradores</h2>
+            <p>Esta hoja guarda el nombre, sección, tipo de contrato, horas trabajadas mensuales y días informados con licencia, permiso o vacaciones. El módulo de horario semanal usa esta misma base para tomar el nombre y la sección.</p>
+          </div>
+          <label class="month-picker">
+            Mes de control
+            <input id="database-month" type="month" />
+          </label>
+        </div>
+
+        <div class="table-wrap database-wrap" aria-live="polite">
+          <table class="database-table">
+            <thead>
+              <tr>
+                <th>Colaborador</th>
+                <th>Sección</th>
+                <th>Contrato</th>
+                <th>Horas trabajadas mes</th>
+                <th>Licencia (días)</th>
+                <th>Permiso (días)</th>
+                <th>Vacaciones (días)</th>
+              </tr>
+            </thead>
+            <tbody id="database-body"></tbody>
+          </table>
+        </div>
+      </section>
+
       <section id="horarios" class="panel scheduler-section">
         <div class="section-heading inline-heading">
           <div>
             <p class="eyebrow">Paso 2</p>
             <h2>Horario semanal</h2>
-            <p>Selecciona la semana, marca días libres y completa hora de entrada y salida para cada colaborador.</p>
+            <p>Selecciona la semana, marca días libres y completa hora de entrada y salida para cada colaborador cargado desde la base de datos.</p>
+            <p class="law-note">Horas pactadas: según la Ley 40 horas, desde el 26 de abril de 2026 la jornada ordinaria máxima en Chile es de 42 horas semanales y bajará a 40 horas desde 2028. Este dato se muestra como explicación legal referencial, no como una opción editable por colaborador.</p>
           </div>
           <label class="week-picker">
             Semana desde
