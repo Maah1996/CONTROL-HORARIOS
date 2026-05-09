@@ -3,20 +3,42 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Control de horarios</title>
+    <title>Horario de trabajo</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="schedule-app" aria-labelledby="page-title">
-      <h1 id="page-title" class="sr-only">Control de horarios semanal</h1>
+    <main class="sheet" aria-labelledby="main-title">
+      <header class="week-strip" aria-label="Semana del lunes 23 al domingo 29">
+        <div class="week-title">SEMANA DEL</div>
+        <div class="week-days">
+          <span>lun&nbsp; 23</span>
+          <span>AL</span>
+          <span>dom&nbsp; 29</span>
+        </div>
+      </header>
 
-      <section class="schedule-board" aria-label="Control de horarios semanal por colaborador">
-        <table class="weekly-table">
-          <thead>
-            <tr id="scheduleHead"></tr>
-          </thead>
-          <tbody id="scheduleBody"></tbody>
-        </table>
+      <section class="schedule-card" aria-label="Horario semanal de trabajo">
+        <h1 id="main-title">HORARIO DE TRABAJO</h1>
+
+        <div class="table-wrap">
+          <table class="work-table">
+            <thead>
+              <tr>
+                <th class="meta-head">AM/PM</th>
+                <th class="name-head">NOMBES</th>
+                <th class="free-head">DIA LIBRE</th>
+                <th class="day-head blue" colspan="2">lun 23 mar</th>
+                <th class="day-head green" colspan="2">mar 24 mar</th>
+                <th class="day-head blue" colspan="2">mié 25 mar</th>
+                <th class="day-head green" colspan="2">jue 26 mar</th>
+                <th class="day-head blue" colspan="2">vie 27 mar</th>
+                <th class="day-head green" colspan="2">sáb 28 mar</th>
+                <th class="day-head blue" colspan="2">dom 29 mar</th>
+              </tr>
+            </thead>
+            <tbody id="schedule-body"></tbody>
+          </table>
+        </div>
       </section>
     </main>
 
