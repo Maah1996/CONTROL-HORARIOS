@@ -26,7 +26,7 @@
           <p class="eyebrow">Hoja independiente</p>
           <h1>BD automática de colaboradores y horarios.</h1>
           <p class="hero-text">
-            Esta base de datos se llena con los colaboradores y horarios creados en la hoja principal. Cada dato puede editarse aquí y vuelve a quedar guardado para el horario semanal.
+            Esta base de datos consolida automáticamente lo acumulado por colaborador: horas trabajadas, horas extra, vacaciones y licencias. Cada semana registrada se suma al mes seleccionado sin duplicar semanas ya guardadas.
           </p>
           <div class="hero-actions">
             <a class="button primary" href="index.html#horarios">Volver a horarios</a>
@@ -42,7 +42,7 @@
           <div>
             <p class="eyebrow">BD</p>
             <h2>Base de datos editable</h2>
-            <p>Los nombres, secciones, contratos y turnos llegan automáticamente desde la hoja de horarios. Si corriges un dato en esta hoja, también se actualiza el horario semanal.</p>
+            <p>Los totales se actualizan desde cada horario semanal guardado. Cambia el mes para revisar lo acumulado en ese periodo.</p>
           </div>
           <label class="month-picker">
             Mes de control
@@ -52,28 +52,18 @@
 
         <div class="database-help">
           <strong>Sincronización automática:</strong>
-          <span>al completar entradas, salidas o días libres en horarios, esta tabla muestra los mismos datos y calcula el total semanal.</span>
+          <span>al completar una semana, la BD acumula horas trabajadas, horas extra, vacaciones y licencias por colaborador.</span>
         </div>
 
         <div class="table-wrap database-wrap" aria-live="polite">
           <table class="database-table schedule-database-table">
             <thead>
               <tr>
-                <th>Colaborador</th>
-                <th>Sección</th>
-                <th>Contrato</th>
-                <th>Lunes</th>
-                <th>Martes</th>
-                <th>Miércoles</th>
-                <th>Jueves</th>
-                <th>Viernes</th>
-                <th>Sábado</th>
-                <th>Domingo</th>
-                <th>Total semana</th>
-                <th>Horas mes</th>
-                <th>Licencia</th>
-                <th>Permiso</th>
-                <th>Vacaciones</th>
+                <th>Nombre del colaborador</th>
+                <th>Total horas de trabajo que lleva</th>
+                <th>Total horas extras que lleva</th>
+                <th>Total días de vacaciones</th>
+                <th>Total días licencia</th>
                 <th>Acciones</th>
               </tr>
             </thead>

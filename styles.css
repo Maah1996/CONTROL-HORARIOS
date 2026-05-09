@@ -428,17 +428,24 @@ select:focus {
   font-weight: 900;
 }
 
-.free-toggle {
-  display: flex;
-  grid-template-columns: auto 1fr;
+.free-toggle,
+.status-toggle {
+  display: grid;
   align-items: center;
   gap: 8px;
   margin-bottom: 10px;
   color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 900;
 }
 
 .free-toggle input {
   width: auto;
+}
+
+.status-toggle select {
+  min-width: 116px;
+  padding: 9px;
 }
 
 .time-fields {
@@ -654,7 +661,7 @@ select:focus {
 }
 
 .schedule-database-table {
-  min-width: 1880px;
+  min-width: 980px;
 }
 
 .schedule-database-table th {

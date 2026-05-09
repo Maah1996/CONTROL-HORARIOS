@@ -121,7 +121,7 @@
           <div>
             <p class="eyebrow">Paso 2</p>
             <h2>Horario semanal</h2>
-            <p>Selecciona la semana, marca días libres y completa hora de entrada y salida para cada colaborador cargado desde la base de datos.</p>
+            <p>Selecciona la semana, marca si cada día es trabajado, libre, vacaciones o licencia, y completa hora de entrada y salida cuando corresponda.</p>
             <p class="law-note">Horas pactadas: según la Ley 40 horas, desde el 26 de abril de 2026 la jornada ordinaria máxima en Chile es de 42 horas semanales y bajará a 40 horas desde 2028. Este dato se muestra como explicación legal referencial, no como una opción editable por colaborador.</p>
           </div>
           <label class="week-picker">
@@ -170,8 +170,14 @@
     <template id="day-cell-template">
       <fieldset class="day-cell">
         <legend></legend>
-        <label class="free-toggle">
-          <input type="checkbox" /> Libre
+        <label class="status-toggle">
+          Estado
+          <select>
+            <option>Trabaja</option>
+            <option>Libre</option>
+            <option>Vacaciones</option>
+            <option>Licencia</option>
+          </select>
         </label>
         <div class="time-fields">
           <label>Entrada <input type="time" /></label>
