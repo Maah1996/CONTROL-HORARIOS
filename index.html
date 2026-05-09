@@ -121,20 +121,49 @@
           <div>
             <p class="eyebrow">Paso 2</p>
             <h2>Horario semanal</h2>
-            <p>Selecciona la semana, marca si cada día es trabajado, libre, vacaciones o licencia, y completa hora de entrada y salida cuando corresponda.</p>
+            <p>Elige el mes y la semana para crear el turno. Puedes cargar semanas guardadas, repetir una semana y preparar la impresión por sección.</p>
             <p class="law-note">Horas pactadas: según la Ley 40 horas, desde el 26 de abril de 2026 la jornada ordinaria máxima en Chile es de 42 horas semanales y bajará a 40 horas desde 2028. Este dato se muestra como explicación legal referencial, no como una opción editable por colaborador.</p>
           </div>
-          <label class="week-picker">
-            Semana desde
-            <input id="week-start" type="date" />
-          </label>
+          <div class="week-controls" aria-label="Selección de semana">
+            <label class="month-picker">
+              Mes del turno
+              <input id="schedule-month" type="month" />
+            </label>
+            <label class="week-picker">
+              Semana para crear turno
+              <select id="week-start"></select>
+            </label>
+          </div>
         </div>
 
         <div class="schedule-toolbar">
-          <button id="clear-schedule" class="button ghost" type="button">Limpiar horarios</button>
+          <label class="toolbar-field">
+            Cargar semana
+            <select id="load-week"></select>
+          </label>
+          <button id="load-week-button" class="button secondary" type="button">Cargar semana</button>
+          <button id="clear-schedule" class="button ghost" type="button">Limpiar horario</button>
           <button id="load-demo" class="button secondary" type="button">Cargar ejemplo</button>
+          <label class="toolbar-field">
+            Imprimir sección
+            <select id="print-section"></select>
+          </label>
           <button id="print-page" class="button primary" type="button">Imprimir / PDF</button>
         </div>
+
+        <div class="repeat-week-box">
+          <div>
+            <strong>¿Quieres repetir esta semana?</strong>
+            <span>Copia el turno visible a otra semana del calendario.</span>
+          </div>
+          <label>
+            Repetir en
+            <select id="repeat-week"></select>
+          </label>
+          <button id="repeat-week-button" class="button ghost" type="button">Repetir semana</button>
+        </div>
+
+        <h2 id="print-title" class="print-title"></h2>
 
         <div class="table-wrap" aria-live="polite">
           <table class="schedule-table">
@@ -166,26 +195,6 @@
         Herramienta referencial para planificación interna. No reemplaza asesoría laboral ni la revisión de contratos, pactos colectivos, descansos, colación u otras reglas especiales.
       </p>
     </footer>
-
-    <template id="day-cell-template">
-      <fieldset class="day-cell">
-        <legend></legend>
-        <label class="status-toggle">
-          Estado
-          <select>
-            <option>Trabaja</option>
-            <option>Libre</option>
-            <option>Vacaciones</option>
-            <option>Licencia</option>
-          </select>
-        </label>
-        <div class="time-fields">
-          <label>Entrada <input type="time" /></label>
-          <label>Salida <input type="time" /></label>
-        </div>
-        <small></small>
-      </fieldset>
-    </template>
 
     <script src="script.js"></script>
   </body>

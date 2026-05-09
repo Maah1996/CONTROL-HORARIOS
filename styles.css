@@ -714,3 +714,257 @@ select:focus {
     display: none !important;
   }
 }
+
+.week-controls {
+  display: grid;
+  grid-template-columns: minmax(170px, 210px) minmax(260px, 360px);
+  gap: 12px;
+  align-items: end;
+}
+
+.toolbar-field {
+  min-width: 220px;
+}
+
+.repeat-week-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: end;
+  justify-content: space-between;
+  margin: 18px 0;
+  border: 1px solid #bfdbfe;
+  border-radius: 20px;
+  padding: 14px 16px;
+  background: #eff6ff;
+}
+
+.repeat-week-box strong,
+.repeat-week-box span {
+  display: block;
+}
+
+.repeat-week-box span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.repeat-week-box label {
+  min-width: 260px;
+}
+
+.print-title {
+  display: none;
+  margin: 0 0 16px;
+  text-align: center;
+  color: #0f172a;
+  font-size: 1.2rem;
+  letter-spacing: 0;
+}
+
+.schedule-table {
+  min-width: 1380px;
+}
+
+.schedule-table th,
+.schedule-table td {
+  padding: 9px;
+}
+
+.employee-cell {
+  min-width: 185px;
+  max-width: 210px;
+}
+
+.employee-cell select,
+.turn-cell select,
+.section-cell select {
+  padding: 9px;
+}
+
+.employee-cell strong {
+  margin-top: 8px;
+  font-size: 0.95rem;
+}
+
+.turn-cell,
+.section-cell {
+  min-width: 128px;
+  background: #f8fafc;
+}
+
+.day-column {
+  min-width: 118px;
+}
+
+.day-cell {
+  min-width: 104px;
+}
+
+.day-cell legend {
+  display: none;
+}
+
+.free-toggle {
+  grid-template-columns: auto 1fr;
+  justify-content: start;
+  color: #111827;
+}
+
+.free-toggle input {
+  width: 16px;
+  height: 16px;
+}
+
+.free-day-cell {
+  background: #f1f5f9;
+}
+
+.day-cell.is-free {
+  display: grid;
+  min-height: 106px;
+  place-items: center;
+  text-align: center;
+}
+
+.day-cell.is-free .free-toggle,
+.day-cell.is-free .time-fields {
+  display: none;
+}
+
+.day-cell.is-free small {
+  margin: 0;
+  color: #111827;
+  font-size: 1rem;
+  font-weight: 1000;
+}
+
+.time-fields input {
+  padding: 7px;
+}
+
+.total-column {
+  min-width: 88px;
+}
+
+@media (max-width: 980px) {
+  .week-controls {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .toolbar-field,
+  .repeat-week-box label {
+    width: 100%;
+  }
+}
+
+@media print {
+  @page {
+    size: landscape;
+    margin: 12mm;
+  }
+
+  body.print-filter-active tr[data-print-hidden="true"] {
+    display: none !important;
+  }
+
+  .hero,
+  .stats-panel,
+  #colaboradores,
+  #resumen,
+  .footer,
+  .section-heading,
+  .repeat-week-box,
+  .total-column,
+  .delete-btn,
+  .schedule-toolbar {
+    display: none !important;
+  }
+
+  main,
+  .panel {
+    margin: 0;
+    padding: 0;
+  }
+
+  .scheduler-section,
+  .table-wrap {
+    border: 0;
+    box-shadow: none;
+  }
+
+  .print-title {
+    display: block;
+  }
+
+  .schedule-table {
+    min-width: 0;
+    width: 100%;
+    font-size: 10px;
+  }
+
+  .schedule-table th,
+  .schedule-table td {
+    padding: 5px;
+  }
+
+  .schedule-table th {
+    position: static;
+    background: #e5e7eb !important;
+    color: #111827 !important;
+  }
+
+  .employee-cell select,
+  .turn-cell select,
+  .section-cell select,
+  .free-toggle,
+  .day-cell legend {
+    display: none !important;
+  }
+
+  .employee-cell,
+  .turn-cell,
+  .section-cell {
+    min-width: 0;
+    max-width: none;
+    background: #ffffff !important;
+  }
+
+  .employee-cell strong {
+    margin: 0;
+  }
+
+  .day-cell,
+  .day-cell.is-free {
+    min-width: 0;
+    min-height: 0;
+    display: block;
+  }
+
+  .time-fields {
+    gap: 2px;
+  }
+
+  .time-fields label {
+    color: #111827;
+    font-size: 9px;
+  }
+
+  .time-fields input {
+    border: 0;
+    padding: 0;
+    font-size: 10px;
+  }
+}
+
+.print-cell-text {
+  display: none;
+}
+
+@media print {
+  .print-cell-text {
+    display: inline !important;
+  }
+}
