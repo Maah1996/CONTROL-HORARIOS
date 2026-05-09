@@ -1,7 +1,6 @@
 const STORAGE_KEY = "control-horarios-chile";
 const CURRENT_CHILE_LIMIT = 42;
 const DAY_NAMES = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-const CONTRACT_TYPES = ["Ordinario", "Parcial", "Turnos", "Artículo 22"];
 
 function generateId() {
   if (globalThis.crypto?.randomUUID) {
@@ -14,9 +13,20 @@ function generateId() {
 function createMonthlyRecord() {
   return {
     workedHours: 0,
+    overtimeHours: 0,
     licenseDays: 0,
-    permitDays: 0,
     vacationDays: 0,
+  };
+}
+
+function normalizeShift(shift = {}) {
+  const status = shift.status ?? (shift.free ? "free" : "work");
+
+  return {
+    start: shift.start ?? "",
+    end: shift.end ?? "",
+    free: status === "free",
+    status,
   };
 }
 
@@ -24,15 +34,27 @@ function getCurrentMonthKey() {
   return new Date().toISOString().slice(0, 7);
 }
 
-function createEmployee({ name, section, contract, shifts = createBlankShifts(), monthlyRecords = {}, id = generateId() }) {
+function createEmployee({
+  name,
+  section,
+  contract,
+  shifts = createBlankShifts(),
+  monthlyRecords = {},
+  weeklyRecords = {},
+  weekSchedules = {},
+  id = generateId(),
+}) {
   const currentMonth = getCurrentMonthKey();
+  const normalizedShifts = normalizeShifts(shifts);
 
   return {
     id,
     name,
     section,
     contract,
-    shifts,
+    shifts: normalizedShifts,
+    weeklyRecords,
+    weekSchedules: normalizeWeekSchedules(weekSchedules),
     monthlyRecords: {
       [currentMonth]: createMonthlyRecord(),
       ...monthlyRecords,
@@ -46,7 +68,7 @@ const demoEmployees = [
     section: "SALA DE VENTA",
     contract: "Ordinario",
     monthlyRecords: {
-      [getCurrentMonthKey()]: { workedHours: 168, licenseDays: 0, permitDays: 1, vacationDays: 0 },
+      [getCurrentMonthKey()]: { workedHours: 0, overtimeHours: 0, licenseDays: 0, vacationDays: 0 },
     },
     shifts: [
       { start: "08:00", end: "16:30", free: false },
@@ -63,7 +85,7 @@ const demoEmployees = [
     section: "BODEGA",
     contract: "Turnos",
     monthlyRecords: {
-      [getCurrentMonthKey()]: { workedHours: 174, licenseDays: 0, permitDays: 0, vacationDays: 0 },
+      [getCurrentMonthKey()]: { workedHours: 0, overtimeHours: 0, licenseDays: 0, vacationDays: 0 },
     },
     shifts: [
       { start: "07:00", end: "15:00", free: false },
@@ -80,7 +102,7 @@ const demoEmployees = [
     section: "PASTELERÍA",
     contract: "Ordinario",
     monthlyRecords: {
-      [getCurrentMonthKey()]: { workedHours: 160, licenseDays: 2, permitDays: 0, vacationDays: 0 },
+      [getCurrentMonthKey()]: { workedHours: 0, overtimeHours: 0, licenseDays: 0, vacationDays: 0 },
     },
     shifts: [
       { start: "12:00", end: "21:00", free: false },
@@ -95,6 +117,8 @@ const demoEmployees = [
 ];
 
 const state = loadState();
+initializeCurrentWeekSchedules();
+syncCurrentWeekRecords();
 
 const employeeForm = document.querySelector("#employee-form");
 const sectionSelect = document.querySelector("#employee-section");
@@ -146,6 +170,8 @@ function normalizeState(savedState) {
       section: (employee.section ?? "").trim() || "SIN SECCIÓN",
       contract: employee.contract ?? "Ordinario",
       shifts: employee.shifts ?? createBlankShifts(),
+      weeklyRecords: normalizeWeeklyRecords(employee.weeklyRecords ?? {}),
+      weekSchedules: employee.weekSchedules ?? {},
       monthlyRecords: {
         [currentMonth]: createMonthlyRecord(),
         ...monthlyRecords,
@@ -166,7 +192,33 @@ function saveState() {
 }
 
 function createBlankShifts() {
-  return DAY_NAMES.map(() => ({ start: "", end: "", free: false }));
+  return DAY_NAMES.map(() => ({ start: "", end: "", free: false, status: "work" }));
+}
+
+function normalizeShifts(shifts = createBlankShifts()) {
+  const normalized = DAY_NAMES.map((_, index) => normalizeShift(shifts[index]));
+  return normalized;
+}
+
+function normalizeWeekSchedules(weekSchedules = {}) {
+  return Object.fromEntries(
+    Object.entries(weekSchedules).map(([weekStart, shifts]) => [weekStart, normalizeShifts(shifts)]),
+  );
+}
+
+function normalizeWeeklyRecords(weeklyRecords = {}) {
+  return Object.fromEntries(
+    Object.entries(weeklyRecords).map(([weekStart, record]) => [
+      weekStart,
+      {
+        month: record.month ?? weekStart.slice(0, 7),
+        workedHours: Number(record.workedHours ?? 0),
+        overtimeHours: Number(record.overtimeHours ?? record.overtime ?? 0),
+        vacationDays: Number(record.vacationDays ?? 0),
+        licenseDays: Number(record.licenseDays ?? 0),
+      },
+    ]),
+  );
 }
 
 function formatHours(hours) {
@@ -192,7 +244,7 @@ function timeToMinutes(time) {
 }
 
 function calculateShiftHours(shift) {
-  if (shift.free || !shift.start || !shift.end) {
+  if ((shift.status ?? (shift.free ? "free" : "work")) !== "work" || !shift.start || !shift.end) {
     return 0;
   }
 
@@ -229,6 +281,82 @@ function getMonthlyRecord(employee, month = state.databaseMonth) {
   }
 
   return employee.monthlyRecords[month];
+}
+
+function getEmployeeShifts(employee, weekStart = state.weekStart) {
+  if (!employee.weekSchedules) {
+    employee.weekSchedules = {};
+  }
+
+  if (!employee.weekSchedules[weekStart]) {
+    employee.weekSchedules[weekStart] = createBlankShifts();
+  }
+
+  employee.shifts = employee.weekSchedules[weekStart];
+  return employee.weekSchedules[weekStart];
+}
+
+function initializeCurrentWeekSchedules() {
+  state.employees.forEach((employee) => {
+    if (!employee.weekSchedules) {
+      employee.weekSchedules = {};
+    }
+
+    if (!employee.weekSchedules[state.weekStart]) {
+      employee.weekSchedules[state.weekStart] = normalizeShifts(employee.shifts ?? createBlankShifts());
+    }
+
+    employee.shifts = employee.weekSchedules[state.weekStart];
+  });
+}
+
+function getWeekMonthKey(weekStart = state.weekStart) {
+  return weekStart.slice(0, 7);
+}
+
+function syncEmployeeWeekRecord(employee) {
+  if (!employee.weeklyRecords) {
+    employee.weeklyRecords = {};
+  }
+
+  const totals = getEmployeeTotals(employee);
+  const shifts = getEmployeeShifts(employee);
+  employee.weeklyRecords[state.weekStart] = {
+    month: getWeekMonthKey(),
+    workedHours: totals.total,
+    overtimeHours: totals.overtime,
+    vacationDays: shifts.filter((shift) => shift.status === "vacation").length,
+    licenseDays: shifts.filter((shift) => shift.status === "license").length,
+  };
+}
+
+function syncCurrentWeekRecords() {
+  state.employees.forEach(syncEmployeeWeekRecord);
+}
+
+function getAccumulatedRecord(employee, month = state.databaseMonth) {
+  syncEmployeeWeekRecord(employee);
+
+  const automaticTotals = Object.values(employee.weeklyRecords ?? {})
+    .filter((record) => record.month === month)
+    .reduce(
+      (totals, record) => ({
+        workedHours: totals.workedHours + Number(record.workedHours ?? 0),
+        overtimeHours: totals.overtimeHours + Number(record.overtimeHours ?? 0),
+        vacationDays: totals.vacationDays + Number(record.vacationDays ?? 0),
+        licenseDays: totals.licenseDays + Number(record.licenseDays ?? 0),
+      }),
+      createMonthlyRecord(),
+    );
+
+  const manualRecord = getMonthlyRecord(employee, month);
+
+  return {
+    workedHours: automaticTotals.workedHours + Number(manualRecord.workedHours ?? 0),
+    overtimeHours: automaticTotals.overtimeHours + Number(manualRecord.overtimeHours ?? 0),
+    vacationDays: automaticTotals.vacationDays + Number(manualRecord.vacationDays ?? 0),
+    licenseDays: automaticTotals.licenseDays + Number(manualRecord.licenseDays ?? 0),
+  };
 }
 
 function renderHeader() {
@@ -271,9 +399,8 @@ function renderSchedule() {
 
   scheduleBody.innerHTML = state.employees
     .map((employee, employeeIndex) => {
-      const dayCells = employee.shifts
-        .map((shift, dayIndex) => createDayCell(employeeIndex, dayIndex, shift))
-        .join("");
+      const shifts = getEmployeeShifts(employee);
+      const dayCells = shifts.map((shift, dayIndex) => createDayCell(employeeIndex, dayIndex, shift)).join("");
       const total = getEmployeeTotals(employee).total;
 
       return `
@@ -298,25 +425,33 @@ function renderSchedule() {
 
 function createDayCell(employeeIndex, dayIndex, shift) {
   const hours = calculateShiftHours(shift);
-  const freeClass = shift.free ? " is-free" : "";
-  const checked = shift.free ? "checked" : "";
+  const status = shift.status ?? (shift.free ? "free" : "work");
+  const inactiveClass = status !== "work" ? " is-free" : "";
+  const disabled = status !== "work" ? "disabled" : "";
+  const statusLabel = { work: formatHours(hours), free: "Día libre", vacation: "Vacaciones", license: "Licencia" }[status];
 
   return `
     <td>
-      <fieldset class="day-cell${freeClass}">
+      <fieldset class="day-cell${inactiveClass}">
         <legend>${DAY_NAMES[dayIndex]}</legend>
-        <label class="free-toggle">
-          <input type="checkbox" data-field="free" data-employee="${employeeIndex}" data-day="${dayIndex}" ${checked} /> Libre
+        <label class="status-toggle">
+          Estado
+          <select data-field="status" data-employee="${employeeIndex}" data-day="${dayIndex}">
+            <option value="work" ${status === "work" ? "selected" : ""}>Trabaja</option>
+            <option value="free" ${status === "free" ? "selected" : ""}>Libre</option>
+            <option value="vacation" ${status === "vacation" ? "selected" : ""}>Vacaciones</option>
+            <option value="license" ${status === "license" ? "selected" : ""}>Licencia</option>
+          </select>
         </label>
         <div class="time-fields">
           <label>Entrada
-            <input type="time" data-field="start" data-employee="${employeeIndex}" data-day="${dayIndex}" value="${shift.start}" />
+            <input type="time" data-field="start" data-employee="${employeeIndex}" data-day="${dayIndex}" value="${shift.start}" ${disabled} />
           </label>
           <label>Salida
-            <input type="time" data-field="end" data-employee="${employeeIndex}" data-day="${dayIndex}" value="${shift.end}" />
+            <input type="time" data-field="end" data-employee="${employeeIndex}" data-day="${dayIndex}" value="${shift.end}" ${disabled} />
           </label>
         </div>
-        <small>${shift.free ? "Día libre" : formatHours(hours)}</small>
+        <small>${statusLabel}</small>
       </fieldset>
     </td>
   `;
@@ -326,19 +461,23 @@ function bindScheduleEvents() {
   scheduleBody.querySelectorAll("input[data-field]").forEach((input) => {
     input.addEventListener("change", (event) => {
       const { employee, day, field } = event.target.dataset;
-      const shift = state.employees[Number(employee)].shifts[Number(day)];
+      const employeeRecord = state.employees[Number(employee)];
+      const shift = getEmployeeShifts(employeeRecord)[Number(day)];
 
-      if (field === "free") {
-        shift.free = event.target.checked;
-        if (shift.free) {
+      if (field === "status") {
+        shift.status = event.target.value;
+        shift.free = shift.status === "free";
+        if (shift.status !== "work") {
           shift.start = "";
           shift.end = "";
         }
       } else {
         shift[field] = event.target.value;
+        shift.status = "work";
         shift.free = false;
       }
 
+      syncEmployeeWeekRecord(employeeRecord);
       saveState();
       renderSchedule();
     });
@@ -354,7 +493,7 @@ function bindScheduleEvents() {
 }
 
 function getEmployeeTotals(employee) {
-  const dayHours = employee.shifts.map(calculateShiftHours);
+  const dayHours = getEmployeeShifts(employee).map(calculateShiftHours);
   const total = dayHours.reduce((sum, hours) => sum + hours, 0);
   const weeklyLimit = Number(state.legalLimit);
   const overtime = Math.max(total - weeklyLimit, 0);
@@ -414,10 +553,12 @@ function renderDatabase() {
     return;
   }
 
+  syncCurrentWeekRecords();
+
   if (!state.employees.length) {
     databaseBody.innerHTML = `
       <tr>
-        <td colspan="16">La BD aún no tiene colaboradores registrados. Vuelve a horarios y agrega el primer colaborador.</td>
+        <td colspan="6">La BD aún no tiene colaboradores registrados. Vuelve a horarios y agrega el primer colaborador.</td>
       </tr>
     `;
     return;
@@ -425,53 +566,23 @@ function renderDatabase() {
 
   databaseBody.innerHTML = state.employees
     .map((employee) => {
-      const record = getMonthlyRecord(employee);
-      const total = getEmployeeTotals(employee).total;
-      const dayCells = employee.shifts.map((shift, dayIndex) => createDatabaseDayCell(employee, shift, dayIndex)).join("");
-      const contractOptions = CONTRACT_TYPES.map(
-        (contract) => `<option value="${escapeHTML(contract)}" ${employee.contract === contract ? "selected" : ""}>${escapeHTML(contract)}</option>`,
-      ).join("");
+      const record = getAccumulatedRecord(employee);
 
       return `
         <tr>
           <td><input type="text" value="${escapeHTML(employee.name)}" data-employee-field="name" data-employee-id="${employee.id}" aria-label="Nombre de ${escapeHTML(employee.name)}" /></td>
-          <td><input type="text" value="${escapeHTML(employee.section)}" data-employee-field="section" data-employee-id="${employee.id}" aria-label="Sección de ${escapeHTML(employee.name)}" /></td>
-          <td>
-            <select data-employee-field="contract" data-employee-id="${employee.id}" aria-label="Contrato de ${escapeHTML(employee.name)}">
-              ${contractOptions}
-            </select>
-          </td>
-          ${dayCells}
-          <td><strong>${formatHours(total)}</strong></td>
-          <td><input type="number" min="0" step="0.5" value="${record.workedHours}" data-record-field="workedHours" data-employee-id="${employee.id}" aria-label="Horas trabajadas mensuales de ${escapeHTML(employee.name)}" /></td>
-          <td><input type="number" min="0" step="1" value="${record.licenseDays}" data-record-field="licenseDays" data-employee-id="${employee.id}" aria-label="Días de licencia de ${escapeHTML(employee.name)}" /></td>
-          <td><input type="number" min="0" step="1" value="${record.permitDays}" data-record-field="permitDays" data-employee-id="${employee.id}" aria-label="Días de permiso de ${escapeHTML(employee.name)}" /></td>
-          <td><input type="number" min="0" step="1" value="${record.vacationDays}" data-record-field="vacationDays" data-employee-id="${employee.id}" aria-label="Días de vacaciones de ${escapeHTML(employee.name)}" /></td>
+          <td><strong>${formatHours(record.workedHours)}</strong></td>
+          <td><strong>${formatHours(record.overtimeHours)}</strong></td>
+          <td><strong>${record.vacationDays.toLocaleString("es-CL")}</strong></td>
+          <td><strong>${record.licenseDays.toLocaleString("es-CL")}</strong></td>
           <td><button class="delete-btn" type="button" data-delete="${employee.id}">Eliminar</button></td>
         </tr>
       `;
     })
     .join("");
 
+  saveState();
   bindDatabaseEvents();
-}
-
-function createDatabaseDayCell(employee, shift, dayIndex) {
-  const checked = shift.free ? "checked" : "";
-  const disabled = shift.free ? "disabled" : "";
-
-  return `
-    <td class="database-day-cell">
-      <label class="free-toggle compact-toggle">
-        <input type="checkbox" data-shift-field="free" data-employee-id="${employee.id}" data-day="${dayIndex}" ${checked} /> Libre
-      </label>
-      <div class="database-time-fields">
-        <input type="time" value="${escapeHTML(shift.start)}" data-shift-field="start" data-employee-id="${employee.id}" data-day="${dayIndex}" aria-label="Entrada ${DAY_NAMES[dayIndex]} de ${escapeHTML(employee.name)}" ${disabled} />
-        <input type="time" value="${escapeHTML(shift.end)}" data-shift-field="end" data-employee-id="${employee.id}" data-day="${dayIndex}" aria-label="Salida ${DAY_NAMES[dayIndex]} de ${escapeHTML(employee.name)}" ${disabled} />
-      </div>
-      <small>${shift.free ? "Libre" : formatHours(calculateShiftHours(shift))}</small>
-    </td>
-  `;
 }
 
 function findEmployeeByDataset(target) {
@@ -479,7 +590,7 @@ function findEmployeeByDataset(target) {
 }
 
 function bindDatabaseEvents() {
-  databaseBody.querySelectorAll("input[data-record-field]").forEach((input) => {
+  databaseBody.querySelectorAll("input[data-employee-field]").forEach((input) => {
     input.addEventListener("change", (event) => {
       const employee = findEmployeeByDataset(event.target);
 
@@ -487,49 +598,7 @@ function bindDatabaseEvents() {
         return;
       }
 
-      const record = getMonthlyRecord(employee);
-      record[event.target.dataset.recordField] = Number(event.target.value);
-      saveState();
-    });
-  });
-
-  databaseBody.querySelectorAll("input[data-employee-field], select[data-employee-field]").forEach((input) => {
-    input.addEventListener("change", (event) => {
-      const employee = findEmployeeByDataset(event.target);
-
-      if (!employee) {
-        return;
-      }
-
-      const field = event.target.dataset.employeeField;
-      employee[field] = field === "section" ? event.target.value.trim().toLocaleUpperCase("es-CL") : event.target.value.trim();
-      saveState();
-      renderSchedule();
-    });
-  });
-
-  databaseBody.querySelectorAll("input[data-shift-field]").forEach((input) => {
-    input.addEventListener("change", (event) => {
-      const employee = findEmployeeByDataset(event.target);
-
-      if (!employee) {
-        return;
-      }
-
-      const shift = employee.shifts[Number(event.target.dataset.day)];
-      const field = event.target.dataset.shiftField;
-
-      if (field === "free") {
-        shift.free = event.target.checked;
-        if (shift.free) {
-          shift.start = "";
-          shift.end = "";
-        }
-      } else {
-        shift[field] = event.target.value;
-        shift.free = false;
-      }
-
+      employee[event.target.dataset.employeeField] = event.target.value.trim();
       saveState();
       renderSchedule();
     });
@@ -624,7 +693,10 @@ if (sectionSelect) {
 
 if (weekStartInput) {
   weekStartInput.addEventListener("change", (event) => {
+    syncCurrentWeekRecords();
     state.weekStart = event.target.value;
+    state.employees.forEach((employee) => getEmployeeShifts(employee));
+    syncCurrentWeekRecords();
     saveState();
     renderSchedule();
   });
@@ -649,7 +721,12 @@ if (legalLimitInput) {
 const clearScheduleButton = document.querySelector("#clear-schedule");
 if (clearScheduleButton) {
   clearScheduleButton.addEventListener("click", () => {
-    state.employees = state.employees.map((employee) => ({ ...employee, shifts: createBlankShifts() }));
+    state.employees.forEach((employee) => {
+      const blankShifts = createBlankShifts();
+      employee.shifts = blankShifts;
+      employee.weekSchedules[state.weekStart] = blankShifts;
+      syncEmployeeWeekRecord(employee);
+    });
     saveState();
     renderSchedule();
   });
@@ -663,9 +740,13 @@ if (loadDemoButton) {
         ...employee,
         id: generateId(),
         shifts: employee.shifts.map((shift) => ({ ...shift })),
+        weekSchedules: {},
+        weeklyRecords: {},
         monthlyRecords: JSON.parse(JSON.stringify(employee.monthlyRecords)),
       }),
     );
+    initializeCurrentWeekSchedules();
+    syncCurrentWeekRecords();
     saveState();
     renderSchedule();
   });
