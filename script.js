@@ -1,6 +1,7 @@
 const STORAGE_KEY = "control-horarios-chile";
 const CURRENT_CHILE_LIMIT = 42;
 const DAY_NAMES = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+const CONTRACT_TYPES = ["Ordinario", "Parcial", "Turnos", "Artículo 22"];
 
 function generateId() {
   if (globalThis.crypto?.randomUUID) {
@@ -173,6 +174,14 @@ function formatHours(hours) {
   return `${rounded.toLocaleString("es-CL", { maximumFractionDigits: 2 })} h`;
 }
 
+function escapeHTML(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
 function timeToMinutes(time) {
   if (!time) {
     return null;
@@ -223,6 +232,10 @@ function getMonthlyRecord(employee, month = state.databaseMonth) {
 }
 
 function renderHeader() {
+  if (!scheduleHead) {
+    return;
+  }
+
   const dayHeaders = getWeekDates()
     .map((day) => `<th>${day.label}<br /><span>${day.shortDate}</span></th>`)
     .join("");
@@ -237,6 +250,12 @@ function renderHeader() {
 }
 
 function renderSchedule() {
+  if (!scheduleBody) {
+    renderSummary();
+    renderDatabase();
+    return;
+  }
+
   renderHeader();
 
   if (!state.employees.length) {
@@ -346,6 +365,10 @@ function getEmployeeTotals(employee) {
 }
 
 function renderSummary() {
+  if (!summaryCards) {
+    return;
+  }
+
   const totals = state.employees.map(getEmployeeTotals);
   const totalHours = totals.reduce((sum, item) => sum + item.total, 0);
   const overtimeHours = totals.reduce((sum, item) => sum + item.overtime, 0);
@@ -394,7 +417,7 @@ function renderDatabase() {
   if (!state.employees.length) {
     databaseBody.innerHTML = `
       <tr>
-        <td colspan="7">La base de datos aún no tiene colaboradores registrados.</td>
+        <td colspan="16">La BD aún no tiene colaboradores registrados. Vuelve a horarios y agrega el primer colaborador.</td>
       </tr>
     `;
     return;
@@ -403,16 +426,28 @@ function renderDatabase() {
   databaseBody.innerHTML = state.employees
     .map((employee) => {
       const record = getMonthlyRecord(employee);
+      const total = getEmployeeTotals(employee).total;
+      const dayCells = employee.shifts.map((shift, dayIndex) => createDatabaseDayCell(employee, shift, dayIndex)).join("");
+      const contractOptions = CONTRACT_TYPES.map(
+        (contract) => `<option value="${escapeHTML(contract)}" ${employee.contract === contract ? "selected" : ""}>${escapeHTML(contract)}</option>`,
+      ).join("");
 
       return `
         <tr>
-          <td><strong>${employee.name}</strong></td>
-          <td>${employee.section}</td>
-          <td>${employee.contract}</td>
-          <td><input type="number" min="0" step="0.5" value="${record.workedHours}" data-record-field="workedHours" data-employee-id="${employee.id}" aria-label="Horas trabajadas mensuales de ${employee.name}" /></td>
-          <td><input type="number" min="0" step="1" value="${record.licenseDays}" data-record-field="licenseDays" data-employee-id="${employee.id}" aria-label="Días de licencia de ${employee.name}" /></td>
-          <td><input type="number" min="0" step="1" value="${record.permitDays}" data-record-field="permitDays" data-employee-id="${employee.id}" aria-label="Días de permiso de ${employee.name}" /></td>
-          <td><input type="number" min="0" step="1" value="${record.vacationDays}" data-record-field="vacationDays" data-employee-id="${employee.id}" aria-label="Días de vacaciones de ${employee.name}" /></td>
+          <td><input type="text" value="${escapeHTML(employee.name)}" data-employee-field="name" data-employee-id="${employee.id}" aria-label="Nombre de ${escapeHTML(employee.name)}" /></td>
+          <td><input type="text" value="${escapeHTML(employee.section)}" data-employee-field="section" data-employee-id="${employee.id}" aria-label="Sección de ${escapeHTML(employee.name)}" /></td>
+          <td>
+            <select data-employee-field="contract" data-employee-id="${employee.id}" aria-label="Contrato de ${escapeHTML(employee.name)}">
+              ${contractOptions}
+            </select>
+          </td>
+          ${dayCells}
+          <td><strong>${formatHours(total)}</strong></td>
+          <td><input type="number" min="0" step="0.5" value="${record.workedHours}" data-record-field="workedHours" data-employee-id="${employee.id}" aria-label="Horas trabajadas mensuales de ${escapeHTML(employee.name)}" /></td>
+          <td><input type="number" min="0" step="1" value="${record.licenseDays}" data-record-field="licenseDays" data-employee-id="${employee.id}" aria-label="Días de licencia de ${escapeHTML(employee.name)}" /></td>
+          <td><input type="number" min="0" step="1" value="${record.permitDays}" data-record-field="permitDays" data-employee-id="${employee.id}" aria-label="Días de permiso de ${escapeHTML(employee.name)}" /></td>
+          <td><input type="number" min="0" step="1" value="${record.vacationDays}" data-record-field="vacationDays" data-employee-id="${employee.id}" aria-label="Días de vacaciones de ${escapeHTML(employee.name)}" /></td>
+          <td><button class="delete-btn" type="button" data-delete="${employee.id}">Eliminar</button></td>
         </tr>
       `;
     })
@@ -421,10 +456,32 @@ function renderDatabase() {
   bindDatabaseEvents();
 }
 
+function createDatabaseDayCell(employee, shift, dayIndex) {
+  const checked = shift.free ? "checked" : "";
+  const disabled = shift.free ? "disabled" : "";
+
+  return `
+    <td class="database-day-cell">
+      <label class="free-toggle compact-toggle">
+        <input type="checkbox" data-shift-field="free" data-employee-id="${employee.id}" data-day="${dayIndex}" ${checked} /> Libre
+      </label>
+      <div class="database-time-fields">
+        <input type="time" value="${escapeHTML(shift.start)}" data-shift-field="start" data-employee-id="${employee.id}" data-day="${dayIndex}" aria-label="Entrada ${DAY_NAMES[dayIndex]} de ${escapeHTML(employee.name)}" ${disabled} />
+        <input type="time" value="${escapeHTML(shift.end)}" data-shift-field="end" data-employee-id="${employee.id}" data-day="${dayIndex}" aria-label="Salida ${DAY_NAMES[dayIndex]} de ${escapeHTML(employee.name)}" ${disabled} />
+      </div>
+      <small>${shift.free ? "Libre" : formatHours(calculateShiftHours(shift))}</small>
+    </td>
+  `;
+}
+
+function findEmployeeByDataset(target) {
+  return state.employees.find((item) => item.id === target.dataset.employeeId);
+}
+
 function bindDatabaseEvents() {
   databaseBody.querySelectorAll("input[data-record-field]").forEach((input) => {
     input.addEventListener("change", (event) => {
-      const employee = state.employees.find((item) => item.id === event.target.dataset.employeeId);
+      const employee = findEmployeeByDataset(event.target);
 
       if (!employee) {
         return;
@@ -433,6 +490,56 @@ function bindDatabaseEvents() {
       const record = getMonthlyRecord(employee);
       record[event.target.dataset.recordField] = Number(event.target.value);
       saveState();
+    });
+  });
+
+  databaseBody.querySelectorAll("input[data-employee-field], select[data-employee-field]").forEach((input) => {
+    input.addEventListener("change", (event) => {
+      const employee = findEmployeeByDataset(event.target);
+
+      if (!employee) {
+        return;
+      }
+
+      const field = event.target.dataset.employeeField;
+      employee[field] = field === "section" ? event.target.value.trim().toLocaleUpperCase("es-CL") : event.target.value.trim();
+      saveState();
+      renderSchedule();
+    });
+  });
+
+  databaseBody.querySelectorAll("input[data-shift-field]").forEach((input) => {
+    input.addEventListener("change", (event) => {
+      const employee = findEmployeeByDataset(event.target);
+
+      if (!employee) {
+        return;
+      }
+
+      const shift = employee.shifts[Number(event.target.dataset.day)];
+      const field = event.target.dataset.shiftField;
+
+      if (field === "free") {
+        shift.free = event.target.checked;
+        if (shift.free) {
+          shift.start = "";
+          shift.end = "";
+        }
+      } else {
+        shift[field] = event.target.value;
+        shift.free = false;
+      }
+
+      saveState();
+      renderSchedule();
+    });
+  });
+
+  databaseBody.querySelectorAll("[data-delete]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.employees = state.employees.filter((employee) => employee.id !== button.dataset.delete);
+      saveState();
+      renderSchedule();
     });
   });
 }
@@ -478,6 +585,10 @@ function getSelectedSection(formData) {
 }
 
 function toggleCustomSection() {
+  if (!sectionSelect || !customSectionLabel || !customSectionInput) {
+    return;
+  }
+
   const isCustomSection = sectionSelect.value === "OTRA";
   customSectionLabel.hidden = !isCustomSection;
   customSectionInput.required = isCustomSection;
@@ -487,67 +598,95 @@ function toggleCustomSection() {
   }
 }
 
-employeeForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const formData = new FormData(employeeForm);
+if (employeeForm) {
+  employeeForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const formData = new FormData(employeeForm);
 
-  state.employees.push(
-    createEmployee({
-      name: formData.get("name").trim(),
-      section: getSelectedSection(formData),
-      contract: formData.get("contract"),
-    }),
-  );
+    state.employees.push(
+      createEmployee({
+        name: formData.get("name").trim(),
+        section: getSelectedSection(formData),
+        contract: formData.get("contract"),
+      }),
+    );
 
-  employeeForm.reset();
-  toggleCustomSection();
-  saveState();
-  renderSchedule();
-});
+    employeeForm.reset();
+    toggleCustomSection();
+    saveState();
+    renderSchedule();
+  });
+}
 
-sectionSelect.addEventListener("change", toggleCustomSection);
+if (sectionSelect) {
+  sectionSelect.addEventListener("change", toggleCustomSection);
+}
 
-weekStartInput.addEventListener("change", (event) => {
-  state.weekStart = event.target.value;
-  saveState();
-  renderSchedule();
-});
+if (weekStartInput) {
+  weekStartInput.addEventListener("change", (event) => {
+    state.weekStart = event.target.value;
+    saveState();
+    renderSchedule();
+  });
+}
 
-databaseMonthInput.addEventListener("change", (event) => {
-  state.databaseMonth = event.target.value;
-  saveState();
-  renderDatabase();
-});
+if (databaseMonthInput) {
+  databaseMonthInput.addEventListener("change", (event) => {
+    state.databaseMonth = event.target.value;
+    saveState();
+    renderDatabase();
+  });
+}
 
-legalLimitInput.addEventListener("change", (event) => {
-  state.legalLimit = Number(event.target.value);
-  saveState();
-  renderSchedule();
-});
+if (legalLimitInput) {
+  legalLimitInput.addEventListener("change", (event) => {
+    state.legalLimit = Number(event.target.value);
+    saveState();
+    renderSchedule();
+  });
+}
 
-document.querySelector("#clear-schedule").addEventListener("click", () => {
-  state.employees = state.employees.map((employee) => ({ ...employee, shifts: createBlankShifts() }));
-  saveState();
-  renderSchedule();
-});
+const clearScheduleButton = document.querySelector("#clear-schedule");
+if (clearScheduleButton) {
+  clearScheduleButton.addEventListener("click", () => {
+    state.employees = state.employees.map((employee) => ({ ...employee, shifts: createBlankShifts() }));
+    saveState();
+    renderSchedule();
+  });
+}
 
-document.querySelector("#load-demo").addEventListener("click", () => {
-  state.employees = demoEmployees.map((employee) =>
-    createEmployee({
-      ...employee,
-      id: generateId(),
-      shifts: employee.shifts.map((shift) => ({ ...shift })),
-      monthlyRecords: JSON.parse(JSON.stringify(employee.monthlyRecords)),
-    }),
-  );
-  saveState();
-  renderSchedule();
-});
+const loadDemoButton = document.querySelector("#load-demo");
+if (loadDemoButton) {
+  loadDemoButton.addEventListener("click", () => {
+    state.employees = demoEmployees.map((employee) =>
+      createEmployee({
+        ...employee,
+        id: generateId(),
+        shifts: employee.shifts.map((shift) => ({ ...shift })),
+        monthlyRecords: JSON.parse(JSON.stringify(employee.monthlyRecords)),
+      }),
+    );
+    saveState();
+    renderSchedule();
+  });
+}
 
-document.querySelector("#print-page").addEventListener("click", () => window.print());
+const printPageButton = document.querySelector("#print-page");
+if (printPageButton) {
+  printPageButton.addEventListener("click", () => window.print());
+}
 
-weekStartInput.value = state.weekStart;
-databaseMonthInput.value = state.databaseMonth;
-legalLimitInput.value = state.legalLimit;
+if (weekStartInput) {
+  weekStartInput.value = state.weekStart;
+}
+
+if (databaseMonthInput) {
+  databaseMonthInput.value = state.databaseMonth;
+}
+
+if (legalLimitInput) {
+  legalLimitInput.value = state.legalLimit;
+}
+
 toggleCustomSection();
 renderSchedule();

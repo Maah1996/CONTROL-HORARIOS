@@ -15,7 +15,7 @@
         </a>
         <div class="nav-links">
           <a href="#colaboradores">Colaboradores</a>
-          <a href="#base-datos">Base de datos</a>
+          <a href="database.html">BD</a>
           <a href="#horarios">Horarios</a>
           <a href="#resumen">Resumen</a>
         </div>
@@ -114,37 +114,6 @@
           </label>
           <button class="button primary" type="submit">Agregar colaborador</button>
         </form>
-      </section>
-
-      <section id="base-datos" class="panel database-section">
-        <div class="section-heading inline-heading">
-          <div>
-            <p class="eyebrow">Base de datos</p>
-            <h2>Registro interno de colaboradores</h2>
-            <p>Esta hoja guarda el nombre, sección, tipo de contrato, horas trabajadas mensuales y días informados con licencia, permiso o vacaciones. El módulo de horario semanal usa esta misma base para tomar el nombre y la sección.</p>
-          </div>
-          <label class="month-picker">
-            Mes de control
-            <input id="database-month" type="month" />
-          </label>
-        </div>
-
-        <div class="table-wrap database-wrap" aria-live="polite">
-          <table class="database-table">
-            <thead>
-              <tr>
-                <th>Colaborador</th>
-                <th>Sección</th>
-                <th>Contrato</th>
-                <th>Horas trabajadas mes</th>
-                <th>Licencia (días)</th>
-                <th>Permiso (días)</th>
-                <th>Vacaciones (días)</th>
-              </tr>
-            </thead>
-            <tbody id="database-body"></tbody>
-          </table>
-        </div>
       </section>
 
       <section id="horarios" class="panel scheduler-section">
