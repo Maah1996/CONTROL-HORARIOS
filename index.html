@@ -3,44 +3,176 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Horario de trabajo</title>
+    <title>Control Horarios Chile</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="sheet" aria-labelledby="main-title">
-      <header class="week-strip" aria-label="Semana del lunes 23 al domingo 29">
-        <div class="week-title">SEMANA DEL</div>
-        <div class="week-days">
-          <span>lun&nbsp; 23</span>
-          <span>AL</span>
-          <span>dom&nbsp; 29</span>
+    <header class="hero">
+      <nav class="topbar" aria-label="Navegación principal">
+        <a class="brand" href="#inicio" aria-label="Control Horarios Chile">
+          <span class="brand-mark">CH</span>
+          <span>Control Horarios</span>
+        </a>
+        <div class="nav-links">
+          <a href="#colaboradores">Colaboradores</a>
+          <a href="#horarios">Horarios</a>
+          <a href="#resumen">Resumen</a>
         </div>
-      </header>
+      </nav>
 
-      <section class="schedule-card" aria-label="Horario semanal de trabajo">
-        <h1 id="main-title">HORARIO DE TRABAJO</h1>
+      <section id="inicio" class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Planificación semanal conforme a Chile</p>
+          <h1>Organiza turnos, secciones y horas extra sin perder el control.</h1>
+          <p class="hero-text">
+            Ingresa colaboradores, asigna su sección de trabajo, registra entradas y salidas por día y revisa al instante si la semana supera la jornada ordinaria vigente en Chile.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#horarios">Crear horario</a>
+            <a class="button secondary" href="#resumen">Ver cumplimiento</a>
+          </div>
+        </div>
 
-        <div class="table-wrap">
-          <table class="work-table">
-            <thead>
-              <tr>
-                <th class="meta-head">AM/PM</th>
-                <th class="name-head">NOMBES</th>
-                <th class="free-head">DIA LIBRE</th>
-                <th class="day-head blue" colspan="2">lun 23 mar</th>
-                <th class="day-head green" colspan="2">mar 24 mar</th>
-                <th class="day-head blue" colspan="2">mié 25 mar</th>
-                <th class="day-head green" colspan="2">jue 26 mar</th>
-                <th class="day-head blue" colspan="2">vie 27 mar</th>
-                <th class="day-head green" colspan="2">sáb 28 mar</th>
-                <th class="day-head blue" colspan="2">dom 29 mar</th>
-              </tr>
-            </thead>
+        <aside class="law-card" aria-labelledby="law-title">
+          <span class="law-badge">Ley 40 horas</span>
+          <h2 id="law-title">Límite semanal actual</h2>
+          <strong><span id="legal-limit-label">42</span> horas</strong>
+          <p>
+            Desde el 26 de abril de 2026 la jornada ordinaria máxima es de 42 horas semanales. El cálculo de esta página es referencial y debe validarse según contrato, pactos y dictámenes aplicables.
+          </p>
+          <ul>
+            <li>Máximo referencial de 2 horas extra por día.</li>
+            <li>Jornada diaria ordinaria referencial hasta 10 horas.</li>
+            <li>Reducción gradual: 40 horas desde 2028.</li>
+          </ul>
+          <p class="source-links">
+            Fuentes: <a href="https://www.dt.gob.cl/portal/1626/w3-article-127092.html" target="_blank" rel="noreferrer">Dirección del Trabajo</a> y
+            <a href="https://www.dt.gob.cl/portal/1626/articles-117137_galeria_02.pdf" target="_blank" rel="noreferrer">Código del Trabajo</a>.
+          </p>
+        </aside>
+      </section>
+    </header>
+
+    <main>
+      <section class="panel stats-panel" aria-label="Indicadores de la semana">
+        <article class="stat">
+          <span>Colaboradores</span>
+          <strong id="stat-collaborators">0</strong>
+        </article>
+        <article class="stat">
+          <span>Horas programadas</span>
+          <strong id="stat-hours">0 h</strong>
+        </article>
+        <article class="stat alert">
+          <span>Horas extra estimadas</span>
+          <strong id="stat-overtime">0 h</strong>
+        </article>
+        <article class="stat">
+          <span>Secciones activas</span>
+          <strong id="stat-sections">0</strong>
+        </article>
+      </section>
+
+      <section id="colaboradores" class="panel form-section">
+        <div class="section-heading">
+          <p class="eyebrow">Paso 1</p>
+          <h2>Ingresar colaborador y sección</h2>
+          <p>Registra a cada persona con su cargo, sección, tipo de contrato y horas semanales pactadas.</p>
+        </div>
+
+        <form id="employee-form" class="employee-form">
+          <label>
+            Nombre completo
+            <input id="employee-name" name="name" type="text" placeholder="Ej: Ana Pérez" required />
+          </label>
+          <label>
+            Sección de trabajo
+            <input id="employee-section" name="section" type="text" placeholder="Ej: Cocina, Caja, Bodega" required />
+          </label>
+          <label>
+            Cargo
+            <input id="employee-role" name="role" type="text" placeholder="Ej: Operaria" required />
+          </label>
+          <label>
+            Horas pactadas/semana
+            <input id="employee-limit" name="limit" type="number" min="1" max="42" step="0.5" value="42" required />
+          </label>
+          <label>
+            Tipo de contrato
+            <select id="employee-contract" name="contract">
+              <option value="Ordinario">Ordinario</option>
+              <option value="Parcial">Parcial</option>
+              <option value="Turnos">Turnos</option>
+              <option value="Artículo 22">Artículo 22</option>
+            </select>
+          </label>
+          <button class="button primary" type="submit">Agregar colaborador</button>
+        </form>
+      </section>
+
+      <section id="horarios" class="panel scheduler-section">
+        <div class="section-heading inline-heading">
+          <div>
+            <p class="eyebrow">Paso 2</p>
+            <h2>Horario semanal</h2>
+            <p>Selecciona la semana, marca días libres y completa hora de entrada y salida para cada colaborador.</p>
+          </div>
+          <label class="week-picker">
+            Semana desde
+            <input id="week-start" type="date" />
+          </label>
+        </div>
+
+        <div class="schedule-toolbar">
+          <button id="clear-schedule" class="button ghost" type="button">Limpiar horarios</button>
+          <button id="load-demo" class="button secondary" type="button">Cargar ejemplo</button>
+          <button id="print-page" class="button primary" type="button">Imprimir / PDF</button>
+        </div>
+
+        <div class="table-wrap" aria-live="polite">
+          <table class="schedule-table">
+            <thead id="schedule-head"></thead>
             <tbody id="schedule-body"></tbody>
           </table>
         </div>
       </section>
+
+      <section id="resumen" class="panel summary-section">
+        <div class="section-heading inline-heading">
+          <div>
+            <p class="eyebrow">Paso 3</p>
+            <h2>Resumen legal y horas extra</h2>
+            <p>La aplicación compara las horas trabajadas con el límite semanal individual y muestra alertas preventivas.</p>
+          </div>
+          <label class="legal-input">
+            Límite legal vigente
+            <input id="legal-limit" type="number" min="1" max="42" step="0.5" value="42" />
+          </label>
+        </div>
+
+        <div id="summary-cards" class="summary-grid"></div>
+      </section>
     </main>
+
+    <footer class="footer">
+      <p>
+        Herramienta referencial para planificación interna. No reemplaza asesoría laboral ni la revisión de contratos, pactos colectivos, descansos, colación u otras reglas especiales.
+      </p>
+    </footer>
+
+    <template id="day-cell-template">
+      <fieldset class="day-cell">
+        <legend></legend>
+        <label class="free-toggle">
+          <input type="checkbox" /> Libre
+        </label>
+        <div class="time-fields">
+          <label>Entrada <input type="time" /></label>
+          <label>Salida <input type="time" /></label>
+        </div>
+        <small></small>
+      </fieldset>
+    </template>
 
     <script src="script.js"></script>
   </body>
