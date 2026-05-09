@@ -1,11 +1,9 @@
-# Control de horarios semanal
+# Horario de trabajo
 
-Aplicación web estática para crear una planilla semanal por trabajador, elegir estado laboral, seleccionar día libre y calcular las horas semanales objetivo de 42 horas.
+Aplicación web estática que recrea una planilla semanal como la imagen de referencia: encabezado de semana, tabla por turnos, nombres, días libres, horas de entrada/salida y etiquetas verdes de **LIBRE**.
 
 ## Uso
 
 1. Abre `index.html` en un navegador moderno.
-2. Completa el nombre del trabajador, semana y estado.
-3. Selecciona el día libre semanal. El horario de ese día se borra automáticamente y aparece como **Libre**.
-4. Ingresa los horarios de entrada y salida para cada día trabajado.
-5. Revisa el total semanal y usa **Imprimir planilla** para obtener una versión lista para impresión.
+2. Revisa la semana del lunes 23 al domingo 29.
+3. Edita los datos directamente en `script.js` si necesitas cambiar colaboradores, días libres u horarios.
