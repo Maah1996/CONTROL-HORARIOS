@@ -550,20 +550,21 @@ function createDayCell(employeeIndex, dayIndex, shift) {
   const inactiveClass = status !== "work" ? " is-free" : "";
   const disabled = status !== "work" ? "disabled" : "";
   const statusLabel = status === "work" ? formatHours(hours) : "LIBRE";
+  const rowId = `free-${employeeIndex}-${dayIndex}`;
 
   return `
     <td class="day-column ${status !== "work" ? "free-day-cell" : ""}">
       <fieldset class="day-cell${inactiveClass}">
-        <legend>${DAY_NAMES[dayIndex]}</legend>
+        <legend class="sr-only">${DAY_NAMES[dayIndex]}</legend>
         <label class="free-toggle">
-          <input type="checkbox" data-field="free" data-employee="${employeeIndex}" data-day="${dayIndex}" ${status === "free" ? "checked" : ""} />
+          <input id="${rowId}" type="checkbox" data-field="free" data-employee="${employeeIndex}" data-day="${dayIndex}" ${status === "free" ? "checked" : ""} />
           Libre
         </label>
         <div class="time-fields">
-          <label>Hora
+          <label>Ingreso
             <input type="time" data-field="start" data-employee="${employeeIndex}" data-day="${dayIndex}" value="${shift.start}" ${disabled} />
           </label>
-          <label>Hasta
+          <label>Salida
             <input type="time" data-field="end" data-employee="${employeeIndex}" data-day="${dayIndex}" value="${shift.end}" ${disabled} />
           </label>
         </div>

@@ -717,13 +717,20 @@ select:focus {
 
 .week-controls {
   display: grid;
-  grid-template-columns: minmax(170px, 210px) minmax(260px, 360px);
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
   gap: 12px;
   align-items: end;
+  width: min(620px, 100%);
 }
 
 .toolbar-field {
-  min-width: 220px;
+  min-width: 180px;
+}
+
+.schedule-toolbar > .button,
+.schedule-toolbar > .toolbar-field {
+  flex: 1 1 170px;
+  max-width: 210px;
 }
 
 .repeat-week-box {
@@ -764,7 +771,7 @@ select:focus {
 }
 
 .schedule-table {
-  min-width: 1380px;
+  min-width: 1160px;
 }
 
 .schedule-table th,
@@ -773,8 +780,9 @@ select:focus {
 }
 
 .employee-cell {
-  min-width: 185px;
-  max-width: 210px;
+  width: 132px;
+  min-width: 132px;
+  max-width: 132px;
 }
 
 .employee-cell select,
@@ -784,22 +792,23 @@ select:focus {
 }
 
 .employee-cell strong {
-  margin-top: 8px;
-  font-size: 0.95rem;
+  display: none;
 }
 
 .turn-cell,
 .section-cell {
-  min-width: 128px;
+  width: 132px;
+  min-width: 132px;
   background: #f8fafc;
 }
 
 .day-column {
-  min-width: 118px;
+  width: 132px;
+  min-width: 132px;
 }
 
 .day-cell {
-  min-width: 104px;
+  min-width: 112px;
 }
 
 .day-cell legend {
@@ -807,8 +816,8 @@ select:focus {
 }
 
 .free-toggle {
-  grid-template-columns: auto 1fr;
-  justify-content: start;
+  display: flex;
+  justify-content: flex-start;
   color: #111827;
 }
 
@@ -845,7 +854,24 @@ select:focus {
 }
 
 .total-column {
-  min-width: 88px;
+  width: 132px;
+  min-width: 132px;
+}
+
+.delete-btn {
+  display: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 @media (max-width: 980px) {
