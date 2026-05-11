@@ -342,7 +342,7 @@ select:focus {
 .week-picker,
 .legal-input,
 .month-picker {
-  width: min(240px, 100%);
+  width: min(210px, 100%);
 }
 
 .table-wrap {
@@ -353,7 +353,7 @@ select:focus {
 
 .schedule-table {
   width: 100%;
-  min-width: 1120px;
+  min-width: 980px;
   border-collapse: separate;
   border-spacing: 0;
 }
@@ -387,7 +387,7 @@ select:focus {
 }
 
 .employee-cell {
-  min-width: 210px;
+  min-width: 170px;
   background: #f8fafc;
 }
 
@@ -450,7 +450,8 @@ select:focus {
 
 .time-fields {
   display: grid;
-  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
 }
 
 .time-fields label {
@@ -717,7 +718,7 @@ select:focus {
 
 .week-controls {
   display: grid;
-  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  grid-template-columns: repeat(2, minmax(150px, 1fr));
   gap: 12px;
   align-items: end;
   width: min(620px, 100%);
@@ -729,8 +730,8 @@ select:focus {
 
 .schedule-toolbar > .button,
 .schedule-toolbar > .toolbar-field {
-  flex: 1 1 170px;
-  max-width: 210px;
+  flex: 1 1 150px;
+  max-width: 190px;
 }
 
 .repeat-week-box {
@@ -780,9 +781,9 @@ select:focus {
 }
 
 .employee-cell {
-  width: 132px;
-  min-width: 132px;
-  max-width: 132px;
+  width: 118px;
+  min-width: 118px;
+  max-width: 118px;
 }
 
 .employee-cell select,
@@ -797,18 +798,18 @@ select:focus {
 
 .turn-cell,
 .section-cell {
-  width: 132px;
-  min-width: 132px;
+  width: 118px;
+  min-width: 118px;
   background: #f8fafc;
 }
 
 .day-column {
-  width: 132px;
-  min-width: 132px;
+  width: 118px;
+  min-width: 118px;
 }
 
 .day-cell {
-  min-width: 112px;
+  min-width: 102px;
 }
 
 .day-cell legend {
@@ -831,19 +832,11 @@ select:focus {
 }
 
 .day-cell.is-free {
-  display: grid;
   min-height: 106px;
-  place-items: center;
-  text-align: center;
-}
-
-.day-cell.is-free .free-toggle,
-.day-cell.is-free .time-fields {
-  display: none;
 }
 
 .day-cell.is-free small {
-  margin: 0;
+  margin-top: 8px;
   color: #111827;
   font-size: 1rem;
   font-weight: 1000;
@@ -854,8 +847,8 @@ select:focus {
 }
 
 .total-column {
-  width: 132px;
-  min-width: 132px;
+  width: 118px;
+  min-width: 118px;
 }
 
 .delete-btn {
