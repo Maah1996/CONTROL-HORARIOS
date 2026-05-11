@@ -515,8 +515,6 @@ function renderSchedule() {
             <select data-row-action="pick-employee" data-employee="${employeeIndex}" aria-label="Colaborador de la fila">
               ${employeeOptions.replace(`value="${employeeIndex}"`, `value="${employeeIndex}" selected`)}
             </select>
-            <strong>${escapeHTML(employee.name)}</strong>
-            <button class="delete-btn" type="button" data-delete="${employee.id}">Eliminar</button>
           </td>
           <td class="turn-cell">
             <select data-row-action="shift-type" data-employee="${employeeIndex}" aria-label="Turno de ${escapeHTML(employee.name)}">
@@ -636,13 +634,6 @@ function bindScheduleEvents() {
     });
   });
 
-  scheduleBody.querySelectorAll("[data-delete]").forEach((button) => {
-    button.addEventListener("click", () => {
-      state.employees = state.employees.filter((employee) => employee.id !== button.dataset.delete);
-      saveState();
-      renderSchedule();
-    });
-  });
 }
 
 function getEmployeeTotals(employee) {
